@@ -13,7 +13,13 @@ module.exports = function(filename, username, password){
     inputStream
         .pipe(transformStream)
         .on('data', function(data) {
-           if(data.username == username && data.password == password){
+            
+           if(data.username == username)
+           {
+               if(data.password != password){
+                   result = data;
+                   inputStream.emit("end");
+               }
                result = data;
            } else {
                writeTransformStream.write(data);

@@ -2,7 +2,6 @@ const fs = require('fs');
 const JSONStream = require('JSONStream');
 let result = {};
 module.exports = function(filename, username, password) {
-    
     const transformStream = JSONStream.parse("*");
     const inputStream = fs.createReadStream(filename);
     inputStream
