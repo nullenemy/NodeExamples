@@ -1,8 +1,6 @@
-const command = process.argv[2];
-const initDB = require('./initDB');
-const {encryptPasswordSync} = require('./encrypt');
+const User = require('./models/user');
+const Controller = require('./controllers/user');
 var mysql = require("mysql");
-
 var con = mysql.createConnection({
     host: "localhost",
     user: "testuser",
@@ -15,9 +13,15 @@ var defaultUser = {
     email: "admin@example.com",
     password: "123456"
 }
+const command = process.argv[2];
+const email = process.argv[3];
+const name = process.argv[4];
+const password = process.argv[5];
 
+const newPassword = process.argv[6];
+let user = new User(email,name, password);
 switch(command){
-    case "createtable":
+    case "init":
         con.connect(function(err) {
             if(err) throw err;
             console.log("Connected!");
@@ -29,22 +33,20 @@ switch(command){
                         modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP \
                         )", function(err, result) {
                 if (err) throw err;
-                console.log("Table created");
                 con.end();
             });
         })
         break;
     case "add":
-        con.connect(function(err) {
-            if(err) throw err;
-            console.log("Connected!");
-            console.log(`INSERT INTO users (name, email, password) VALUES ('${defaultUser.name}', '${defaultUser.email}', '${encryptPasswordSync(defaultUser.password)}')`);
-            con.query(`INSERT INTO users (name, email, password) VALUES ('${defaultUser.name}', '${defaultUser.email}', '${encryptPasswordSync(defaultUser.password)}')`, function(err, result) {
-                if (err) throw err;
-                console.log("user added");
-                con.end();
-            });
-        })
+        Controller.add(con, user);
+        break;
+    case "delete":
+        Controller.delete(con, user);
+        break;
+    case "update":
+        Controller.update(con, user, newPassword);
+        break;
+    default:
         break;
 }
 
